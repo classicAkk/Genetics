@@ -1,0 +1,37 @@
+{
+	"render_type": "minecraft:cutout",
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench by justAwyverns; JAW Open Asset License",
+	"textures": {
+		"1": "genetics:block/plant_stage0",
+		"particle": "genetics:block/plant_stage0"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 8],
+			"to": [16, 10, 8],
+			"rotation": {"angle": -45, "axis": "y", "origin": [8, 1, 8]},
+			"faces": {
+				"north": {"uv": [0, 6, 16, 16], "texture": "#1"},
+				"east": {"uv": [1, 0, 1, 10], "texture": "#1"},
+				"south": {"uv": [0, 6, 16, 16], "texture": "#1"},
+				"west": {"uv": [1, 0, 1, 10], "texture": "#1"},
+				"up": {"uv": [1, 0, 1, 16], "rotation": 270, "texture": "#1"},
+				"down": {"uv": [1, 0, 1, 16], "rotation": 90, "texture": "#1"}
+			}
+		},
+		{
+			"from": [8, 0, 0],
+			"to": [8, 10, 16],
+			"rotation": {"angle": -45, "axis": "y", "origin": [8, 1, 8]},
+			"faces": {
+				"north": {"uv": [1, 0, 1, 10], "texture": "#1"},
+				"east": {"uv": [0, 6, 16, 16], "texture": "#1"},
+				"south": {"uv": [1, 0, 1, 10], "texture": "#1"},
+				"west": {"uv": [0, 6, 16, 16], "texture": "#1"},
+				"up": {"uv": [1, 0, 1, 16], "texture": "#1"},
+				"down": {"uv": [1, 0, 1, 16], "texture": "#1"}
+			}
+		}
+	]
+}

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ingot"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    ".": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "pattern": [
+    "  #",
+    " G ",
+    ".  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "genetics:syringe"
+  },
+  "show_notification": true
+}

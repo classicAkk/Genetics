@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    ".=.",
+    "###",
+    "IAI"
+  ],
+  "key": {
+    ".": {
+      "item": "minecraft:redstone"
+    },
+    "=": {
+      "item": "minecraft:iron_ingot"
+    },
+    "#": {
+      "item": "minecraft:glass_bottle"
+    },
+    "I": {
+      "item": "minecraft:iron_nugget"
+    },
+    "A": {
+      "item": "modern_industrialization:motor"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "genetics:centrifuge"
+  }
+}

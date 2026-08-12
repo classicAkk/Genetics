@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "state=empty": {"model":  "genetics:block/petri"},
+    "state=stage1": {"model":  "genetics:block/petri_stage1"},
+    "state=stage2": {"model":  "genetics:block/petri_stage2"},
+    "state=ready": {"model":  "genetics:block/petri_ready"},
+    "state=cells": {"model":  "genetics:block/petri_cells"},
+    "state=genetics": {"model":  "genetics:block/petri_genetics"}
+  }
+}

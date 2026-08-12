@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "state=empty": {"model":  "genetics:block/centrifuge"},
+    "state=stage1": {"model":  "genetics:block/centrifuge1"},
+    "state=stage2": {"model":  "genetics:block/centrifuge2"},
+    "state=stage3": {"model":  "genetics:block/centrifuge3"},
+    "state=stage4": {"model":  "genetics:block/centrifuge4"},
+    "state=stage5": {"model":  "genetics:block/centrifuge5"},
+    "state=stage6": {"model":  "genetics:block/centrifuge6"}
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "# .",
+    " N ",
+    "B P"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:melon_seeds"
+    },
+    ".": {
+      "item": "minecraft:wheat_seeds"
+    },
+    "N": {
+      "item": "minecraft:nether_wart"
+    },
+    "B": {
+      "item": "minecraft:beetroot_seeds"
+    },
+    "P": {
+      "item": "minecraft:pumpkin_seeds"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "genetics:gen_plant"
+  }
+}
