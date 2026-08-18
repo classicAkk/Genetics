@@ -3,7 +3,7 @@
 	"format_version": "1.9.0",
 	"credit": "Made with Blockbench by justAwyverns; JAW Open Asset License",
 	"textures": {
-		"0": "genetics:block/petri_stage2",
+		"0": "genetics:block/petri/petri_genetics",
 		"particle": "block/glass"
 	},
 	"elements": [

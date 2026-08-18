@@ -1,12 +1,11 @@
-package net.awyvrix.genetics.content.blocks.genPlant;
+package net.awyvrix.genetics.content.blocks.cloner;
 
 import net.minecraft.util.StringRepresentable;
 
-public enum PlantState implements StringRepresentable {
-    STAGE0,
+public enum ClonerState implements StringRepresentable {
+    EMPTY,
     STAGE1,
-    LOADED,
-    GROW;
+    STAGE2;
 
     @Override
     public String getSerializedName() {

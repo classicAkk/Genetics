@@ -6,7 +6,9 @@ import net.awyvrix.genetics.content.inits.ModItems;
 import net.awyvrix.genetics.registry.MergeRegistry;
 import net.awyvrix.genetics.content.data.ModDataComponents;
 import net.awyvrix.genetics.content.samples.MatrixSample;
+import net.awyvrix.genetics.util.TickableBE;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,10 +23,15 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -33,6 +40,8 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.logging.log4j.core.pattern.NotANumber;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -67,7 +76,22 @@ public class GenPlantBlock extends Block implements EntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState();
+        if (context.getLevel().getBlockState(context.getClickedPos().below()).getBlock() == Blocks.GRASS_BLOCK) return this.defaultBlockState();
+        return null;
+    }
+
+    @Override
+    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        return level.getBlockState(pos.below()).getBlock() == Blocks.GRASS_BLOCK;
+    }
+
+    @Override
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        if (level.getBlockState(pos.below()).getBlock() != Blocks.GRASS_BLOCK) {
+            return Blocks.AIR.defaultBlockState();
+        }
+
+        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
 
     @Override
@@ -99,16 +123,24 @@ public class GenPlantBlock extends Block implements EntityBlock {
 
         if (stack.has(ModDataComponents.MATRIX_SAMPLE) && state.getValue(GenPlantBlock.STATE) == PlantState.STAGE1) {
             if (level.getBlockEntity(pos) instanceof GenPlantBE plant) {
-                plant.sample = stack.get(ModDataComponents.MATRIX_SAMPLE);
-                plant.setChanged();
+                if (stack.is(ModItems.INJECT_SYRINGE.get())) {
+                    plant.gene = stack.get(ModDataComponents.MATRIX_SAMPLE);
+                    plant.dirty = true;
 
-                level.setBlock(pos, state.setValue(GenPlantBlock.STATE, PlantState.LOADED), 3);
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverLevel.sendParticles(ParticleTypes.GLOW, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 20, 0.2, 0.4, 0.2, 0);
+                    }
+                } else {
+                    plant.sample = stack.get(ModDataComponents.MATRIX_SAMPLE);
+                    level.setBlock(pos, state.setValue(GenPlantBlock.STATE, PlantState.LOADED), 3);
 
-                if (stack.is(ModItems.INJECT_SYRINGE)) player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.SYRINGE.get()));
-                if (stack.is(ModItems.DNA_MATRIX)) player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-                if (level instanceof ServerLevel serverLevel) {
-                    serverLevel.sendParticles(ParticleTypes.WAX_ON, pos.getX()+0.5, pos.getY(), pos.getZ()+0.5, 20, 0.2, 0.4, 0.2, 0);
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverLevel.sendParticles(ParticleTypes.WAX_ON, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 20, 0.2, 0.4, 0.2, 0);
+                    }
                 }
+                if (stack.is(ModItems.INJECT_SYRINGE)) player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.SYRINGE.get()));
+                if (stack.is(ModItems.DNA_MATRIX)) stack.shrink(1);
+                plant.setChanged();
             }
         }
 
@@ -125,7 +157,7 @@ public class GenPlantBlock extends Block implements EntityBlock {
             }
         }
 
-        if (stack.is(ModItems.SYRINGE)) {
+        if (stack.is(ModItems.SYRINGE) && (state.getValue(GenPlantBlock.STATE) == PlantState.STAGE1 || state.getValue(GenPlantBlock.STATE) == PlantState.LOADED)) {
             if (stack.has(ModDataComponents.BLOOD_SAMPLE)) {
                 RandomSource random = level.getRandom();
                 List<MatrixSample> matrixSamples = new ArrayList<>();
@@ -138,12 +170,22 @@ public class GenPlantBlock extends Block implements EntityBlock {
 
                 BlockEntity targetPlant = level.getBlockEntity(pos);
 
-                if (plant1 instanceof GenPlantBE plantBE1 && plantBE1.sample != null) preparePlant(matrixSamples, plantBE1, level);
-                if (plant2 instanceof GenPlantBE plantBE2 && plantBE2.sample != null) preparePlant(matrixSamples, plantBE2, level);
-                if (plant3 instanceof GenPlantBE plantBE3 && plantBE3.sample != null) preparePlant(matrixSamples, plantBE3, level);
-                if (plant4 instanceof GenPlantBE plantBE4 && plantBE4.sample != null) preparePlant(matrixSamples, plantBE4, level);
+                List<Double> speed = new ArrayList<>();
+                List<Double> strength = new ArrayList<>();
+
+                if (plant1 instanceof GenPlantBE plantBE1 && plantBE1.sample != null) preparePlant(matrixSamples, speed, strength, plantBE1, level);
+                if (plant2 instanceof GenPlantBE plantBE2 && plantBE2.sample != null) preparePlant(matrixSamples, speed, strength, plantBE2, level);
+                if (plant3 instanceof GenPlantBE plantBE3 && plantBE3.sample != null) preparePlant(matrixSamples, speed, strength, plantBE3, level);
+                if (plant4 instanceof GenPlantBE plantBE4 && plantBE4.sample != null) preparePlant(matrixSamples, speed, strength, plantBE4, level);
                 if (!matrixSamples.isEmpty() && targetPlant instanceof GenPlantBE targetBE && targetBE.sample == null) {
+                    double str = strength.stream().mapToDouble(Double::doubleValue).average().orElse(1.0) * strength.size() / 4;
+                    double spd = speed.stream().mapToDouble(Double::doubleValue).average().orElse(1.0) * speed.size() / 4;
+
+                    if (speed.isEmpty()) spd = 1;
+                    if (strength.isEmpty()) str = 1;
                     Map<Integer, List<GeneValue>> genes = new HashMap<>();
+                    List<GeneValue> geneRow = new ArrayList<>();
+                    List<GeneType> genesRow = new ArrayList<>();
                     List<GeneValue> result = new ArrayList<>();
 
                     for (MatrixSample sample : matrixSamples) {
@@ -152,24 +194,32 @@ public class GenPlantBlock extends Block implements EntityBlock {
                         for (int i = 0; i < values.size(); i++) {
                             GeneValue gene = values.get(i);
                             GeneType type = gene.type();
-                            List<GeneValue> geneRow = genes.computeIfAbsent(i, k -> new ArrayList<>());
+                            genes.computeIfAbsent(i, k -> new ArrayList<>());
 
-                            if (geneRow.contains(gene)) {
+                            if (genesRow.contains(gene.type())) {
                                 int min = gene.purity();
                                 int max = geneRow.get(varToNum(geneRow, gene)).purity() + matrixSamples.size();
-                                geneRow.add(new GeneValue(type, randomBonus(min, max, random)));
+                                double total = randomBonus(min, max, matrixSamples.size() * str, random);
+
+                                GeneValue val = new GeneValue(type, (int) Math.round(total));
+                                genes.get(i).add(val);
+                                geneRow.add(val);
                             } else {
-                                int purity = gene.purity();
-                                geneRow.add(new GeneValue(type, purity));
+                                double purity = randomBonus(gene.purity(), gene.purity(), matrixSamples.size() * str, random);
+
+                                GeneValue val = new GeneValue(type, (int) Math.round(purity));
+                                genes.get(i).add(val);
+                                geneRow.add(val);
                             }
+                            genesRow.add(type);
                         }
                     }
 
                     for (int i = 0; i < genes.size(); i++) {
-                        List<GeneValue> geneRow = genes.get(i);
+                        List<GeneValue> row = genes.get(i);
                         Set<GeneType> mergeSet = new HashSet<>();
 
-                        for (GeneValue gene : geneRow) {
+                        for (GeneValue gene : row) {
                             mergeSet.add(gene.type());
                         }
                         GeneType merge =  MergeRegistry.get(mergeSet);
@@ -178,16 +228,18 @@ public class GenPlantBlock extends Block implements EntityBlock {
                             int var = random.nextInt(0, mergeSet.size());
                             GeneType type = mergeSet.stream().toList().get(var);
 
-                            result.add(new GeneValue(type, geneRow.get(var).purity()));
+                            result.add(new GeneValue(type, row.get(var).purity()));
                         } else {
-                            result.add(new GeneValue(merge, min(geneRow)));
+                            result.add(new GeneValue(merge, min(row)));
                         }
                     }
 
                     player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.SYRINGE.get()));
-                    level.setBlock(pos, state.setValue(GenPlantBlock.STATE, PlantState.LOADED), 3);
+                    level.setBlock(pos, state.setValue(GenPlantBlock.STATE, PlantState.GROW), 3);
                     level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.0f, 1.0f);
-                    targetBE.sample = new MatrixSample(result);
+
+                    targetBE.target = new MatrixSample(result);
+                    targetBE.growTimer = (result.size() + sum(result) * 20) / spd;
                 }
             } else {
                 if (level.getBlockEntity(pos) instanceof GenPlantBE genPlantBE && genPlantBE.sample != null) {
@@ -227,14 +279,17 @@ public class GenPlantBlock extends Block implements EntityBlock {
         }
     }
 
-    public int randomBonus(int a, int b, RandomSource random) {
-        int x = random.nextInt(-2, 3);
-        return random(a, b, random) + x;
+    public double randomBonus(int a, int b, double bonus, RandomSource random) {
+        double x = random.nextInt(-2, 3) * bonus;
+        int y = random(a, b, random);
+        return y + x;
     }
 
-    public void preparePlant(List<MatrixSample> matrixSamples, GenPlantBE plantBE, Level level) {
+    public void preparePlant(List<MatrixSample> matrixSamples, List<Double> speed, List<Double> strength, GenPlantBE plantBE, Level level) {
         BlockPos pos = plantBE.getBlockPos();
         matrixSamples.add(plantBE.sample);
+        if (plantBE.spdDelta != 0) speed.add(plantBE.spdDelta);
+        if (plantBE.strDelta != 0) strength.add(plantBE.strDelta);
 
         plantBE.sample = null;
         plantBE.setChanged();
@@ -246,6 +301,14 @@ public class GenPlantBlock extends Block implements EntityBlock {
         }
     }
 
+    public int sum(List<GeneValue> genes) {
+        int purity = 0;
+        for (GeneValue gene : genes) {
+            purity += gene.purity();
+        }
+        return purity;
+    }
+
     public int randomBonus(int x, RandomSource random) {
         return x + random.nextInt(-2, 3);
     }
@@ -255,5 +318,11 @@ public class GenPlantBlock extends Block implements EntityBlock {
             if (geneRow.get(i) == gene) return i;
         }
         return 0;
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type){
+        return TickableBE.getTickerHelper(level);
     }
 }

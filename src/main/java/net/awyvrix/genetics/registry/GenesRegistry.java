@@ -25,6 +25,8 @@ public final class GenesRegistry {
         GENES.put(EntityType.SALMON, GeneType.WATER_BREATHING);
         GENES.put(EntityType.ENDER_DRAGON, GeneType.DRAGON);
         GENES.put(EntityType.WITHER, GeneType.WITHER);
+        GENES.put(EntityType.CAT, GeneType.CAT);
+        GENES.put(EntityType.FOX, GeneType.FOX);
     }
 
     public static GeneType get(LivingEntity entity) {

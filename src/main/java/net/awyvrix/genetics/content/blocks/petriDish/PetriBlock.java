@@ -5,6 +5,7 @@ import net.awyvrix.genetics.content.inits.ModItems;
 import net.awyvrix.genetics.content.samples.CellSample;
 import net.awyvrix.genetics.util.TickableBE;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -16,7 +17,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -67,6 +71,20 @@ public class PetriBlock extends Block implements EntityBlock {
     }
 
     @Override
+    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        return level.getBlockState(pos.below()).isSolid();
+    }
+
+    @Override
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        if (!level.getBlockState(pos.below()).isSolid()) {
+            return Blocks.AIR.defaultBlockState();
+        }
+
+        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    }
+
+    @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
@@ -103,7 +121,8 @@ public class PetriBlock extends Block implements EntityBlock {
 
         if ((level.getBlockEntity(pos) instanceof PetriBE petri)) {
             if (state.getValue(PetriBlock.STATE) == PetriState.CELLS || state.getValue(PetriBlock.STATE) == PetriState.READY) {
-                if (stack.is(ModItems.CELL.get()) && stack.has(ModDataComponents.CELL_SAMPLE)) {
+                ItemStack offStack = player.getItemInHand(InteractionHand.OFF_HAND);
+                if (stack.has(ModDataComponents.CELL_SAMPLE) && !offStack.has(ModDataComponents.MATRIX_SAMPLE)) {
                     petri.cells++;
                     petri.id = stack.get(ModDataComponents.CELL_SAMPLE).id();
                     petri.owner = stack.get(ModDataComponents.CELL_SAMPLE).owner();

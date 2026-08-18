@@ -30,7 +30,7 @@ public class ModItems {
 
     public static final DeferredItem<Item> DNA_MATRIX = ITEMS.register("dna_matrix",
             () -> new MatrixItem(new Item.Properties()
-                    .stacksTo(1)
+                    .stacksTo(16)
             ));
 
     public static final DeferredItem<Item> CELL = ITEMS.register("cell",

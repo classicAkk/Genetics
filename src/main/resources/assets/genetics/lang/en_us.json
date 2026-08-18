@@ -5,6 +5,7 @@
   "item.genetics.cell": "Cell",
 
   "block.genetics.petri_dish": "Petri Dish",
+  "block.genetics.gen_plant": "Gen Plant Seeds",
   "block.genetics.centrifuge": "Centrifuge",
-  "block.genetics.gen_plant": "Gen Plant Seeds"
+  "block.genetics.cloner": "DNA-Cloner"
 }
