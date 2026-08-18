@@ -1,7 +1,8 @@
 {
   "variants": {
-    "state=stage0": {"model":  "genetics:block/plant_stage0"},
-    "state=stage1": {"model":  "genetics:block/plant_stage1"},
-    "state=loaded": {"model":  "genetics:block/plant_stage2"}
+    "state=stage0": {"model":  "genetics:block/plant/plant_stage0"},
+    "state=stage1": {"model":  "genetics:block/plant/plant_stage1"},
+    "state=loaded": {"model":  "genetics:block/plant/plant_stage2"},
+    "state=grow": {"model":  "genetics:block/plant/plant_stage_grow"}
   }
 }

@@ -1,6 +1,7 @@
 package net.awyvrix.genetics.content.blocks.petriDish;
 
 import net.awyvrix.genetics.content.inits.ModBlockEntities;
+import net.awyvrix.genetics.content.samples.MatrixSample;
 import net.awyvrix.genetics.util.TickableBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;

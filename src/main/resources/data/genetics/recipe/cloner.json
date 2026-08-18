@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    ". .",
+    "###",
+    "IAI"
+  ],
+  "key": {
+    ".": {
+      "item": "minecraft:glass_pane"
+    },
+    "#": {
+      "item": "minecraft:silicon_wafer"
+    },
+    "I": {
+      "item": "modern_industrialization:arithmetic_logic_unit"
+    },
+    "A": {
+      "item": "modern_industrialization:random_access_memory"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "genetics:cloner"
+  }
+}

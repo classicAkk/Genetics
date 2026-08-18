@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench by justAwyverns; JAW Open Asset License",
 	"render_type": "minecraft:cutout",
 	"textures": {
-		"1": "genetics:block/plant_stage2",
-		"particle": "genetics:block/plant_stage2"
+		"1": "genetics:block/plant/plant_stage1",
+		"particle": "genetics:block/plant/plant_stage1"
 	},
 	"elements": [
 		{

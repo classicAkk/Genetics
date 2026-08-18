@@ -1,0 +1,42 @@
+{
+  "variants": {
+    "facing=north,state=empty": {
+      "model":  "genetics:block/cloner/cloner","y": 270
+    },
+    "facing=west,state=empty": {
+      "model":  "genetics:block/cloner/cloner","y": 180
+    },
+    "facing=south,state=empty": {
+      "model":  "genetics:block/cloner/cloner","y": 90
+    },
+    "facing=east,state=empty": {
+      "model":  "genetics:block/cloner/cloner","y": 0
+    },
+
+    "facing=north,state=stage1": {
+      "model":  "genetics:block/cloner/cloner1","y": 270
+    },
+    "facing=west,state=stage1": {
+      "model":  "genetics:block/cloner/cloner1","y": 180
+    },
+    "facing=south,state=stage1": {
+      "model":  "genetics:block/cloner/cloner1","y": 90
+    },
+    "facing=east,state=stage1": {
+      "model":  "genetics:block/cloner/cloner1","y": 0
+    },
+
+    "facing=north,state=stage2": {
+      "model":  "genetics:block/cloner/cloner2","y": 270
+    },
+    "facing=west,state=stage2": {
+      "model":  "genetics:block/cloner/cloner2","y": 180
+    },
+    "facing=south,state=stage2": {
+      "model":  "genetics:block/cloner/cloner2","y": 90
+    },
+    "facing=east,state=stage2": {
+      "model":  "genetics:block/cloner/cloner2","y": 0
+    }
+  }
+}

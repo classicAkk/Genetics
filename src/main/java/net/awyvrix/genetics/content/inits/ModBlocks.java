@@ -2,6 +2,7 @@ package net.awyvrix.genetics.content.inits;
 
 import net.awyvrix.genetics.Genetics;
 import net.awyvrix.genetics.content.blocks.centrifuge.CentrifugeBlock;
+import net.awyvrix.genetics.content.blocks.cloner.ClonerBlock;
 import net.awyvrix.genetics.content.blocks.genPlant.GenPlantBlock;
 import net.awyvrix.genetics.content.blocks.petriDish.PetriBlock;
 import net.minecraft.world.item.BlockItem;
@@ -31,6 +32,11 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> CENTRIFUGE = registerBlock("centrifuge",
             () -> new CentrifugeBlock(BlockBehaviour.Properties.of()
+                    .sound(SoundType.METAL).noOcclusion().strength(1)
+            ));
+
+    public static final DeferredBlock<Block> CLONER = registerBlock("cloner",
+            () -> new ClonerBlock(BlockBehaviour.Properties.of()
                     .sound(SoundType.METAL).noOcclusion().strength(1)
             ));
 
